@@ -1,21 +1,21 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using WebApplication3.DB;
+﻿using WebApplication3.DB;
 using WebApplication3.dto;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace WebApplication3.Controllers
 {
-    public class IncidentsController
-    {
+        [Authorize]
         [Route("api/[controller]")]
         [ApiController]
-        public class AuthController : ControllerBase
+        public class IncidentsController : ControllerBase
         {
             private readonly ItCompany1135Context db;
 
-            public AuthController(ItCompany1135Context db)
+            public IncidentsController(ItCompany1135Context db)
             {
                 this.db = db;
             }
@@ -23,8 +23,8 @@ namespace WebApplication3.Controllers
             [HttpPost("Report")]
             public  ActionResult AddIncident()
             {
-               // var client = GetClient();
-              //  if(client == null)
+                var client = GetClient();
+                if(client == null)
                     return Forbid();
               //  var incident = GetIncident(client.id);
               
@@ -32,7 +32,8 @@ namespace WebApplication3.Controllers
                 return Ok();
             }
 
+
         }
         }
     }
-}
+
