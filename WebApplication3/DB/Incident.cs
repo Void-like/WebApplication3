@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using WebApplication3.dto;
 
 namespace WebApplication3.DB;
 
-public partial class IncidentDTO
+public partial class Incident
 {
     public int Id { get; set; }
 

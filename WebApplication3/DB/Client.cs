@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WebApplication3.dto;
+namespace WebApplication3.DB;
 
 public partial class Client
 {

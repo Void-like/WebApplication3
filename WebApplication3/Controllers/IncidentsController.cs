@@ -19,15 +19,68 @@ namespace WebApplication3.Controllers
         {
             this.db = db;
         }
-
-        [HttpPost("Report")]
-        public ActionResult AddIncident()
+        [HttpPost("ViewCart")]
+        public ActionResult<IEnumerable<IncidentDTO>> ListIncident()
         {
             var client = GetClient();
             if (client == null)
                 return Forbid();
-            //  var incident = GetIncident(client.id);
 
+            var cart = GetIncident(client.Sid);
+
+            var result = client.Incidents.Select(s => new IncidentDTO
+            {
+             Id = s.Id,
+             UserSid = s.UserSid,
+             Title = s.Title,
+             Description = s.Description,
+             Priority = s.Priority,
+             Status = s.Status,
+             AssignedToSid = s.AssignedToSid,
+             ResolvedAt = s.ResolvedAt,
+             ResolutionNotes = s.ResolutionNotes,
+             IsDeleted = s.IsDeleted,
+             DeletedAt = s.DeletedAt,
+             DeletedBy = s.DeletedBy,
+             CreatedAt = s.CreatedAt,
+             CreatedBy = s.CreatedBy,
+             ModifiedAt = s.ModifiedAt,
+             ModifiedBy = s.ModifiedBy,
+             UserS = s.UserS,
+
+            });
+            return Ok(result);
+
+        }
+        [HttpPost("AddIncident")]
+        public async Task<ActionResult> AddIncident(IncidentDTO incidentDTO)
+        {
+            var client = GetClient();
+            if (client == null)
+                return Forbid();
+
+            var incident = GetIncident(client.Sid);
+            client.Incidents.Add(new Incident 
+            { 
+            Id = incident.Id,
+            UserSid = incident.UserSid,
+            Title = incident.Title,
+            Description = incident.Description,
+            Priority = incident.Priority,
+            Status = incident.Status,
+            AssignedToSid = incident.AssignedToSid,
+            ResolvedAt = incident.ResolvedAt,
+            ResolutionNotes = incident.ResolutionNotes,
+            IsDeleted = incident.IsDeleted,
+            DeletedAt = incident.DeletedAt,
+            DeletedBy = incident.DeletedBy,
+            CreatedAt = incident.CreatedAt,
+            CreatedBy = incident.CreatedBy,
+            ModifiedAt = incident.ModifiedAt,
+            ModifiedBy = incident.ModifiedBy,
+            UserS = incident.UserS,
+
+            });
             db.SaveChanges();
             return Ok();
         }
@@ -48,17 +101,26 @@ namespace WebApplication3.Controllers
         }
         Incident? GetIncident(string clientId)
         {
-            var incident = db.Incidents.Find();
+            var incidents = db.Clients.
+                    Include(s => s.Incidents).
+                    ThenInclude(s => s.UserS).
+                    FirstOrDefault(s => s.Sid == clientId &&
+                        s.Incidents.Status == "Новая");
 
-
-            if (incident == null)
+            if (incidents == null)
             {
-
+                incidents = new Incident
+                {
+                    AssignedToSid = Guid.NewGuid().ToString(),
+                    UserSid = clientId,
+                    Status = "Новая"
+                };
+                db.Incidents.Add(incidents);
+                db.SaveChanges();
             }
-            return incident;
-            db.Incidents.Add(incident);
-            db.SaveChanges();
+            return incidents;
         }
+
     }
 }
 
